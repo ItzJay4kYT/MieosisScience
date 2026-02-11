@@ -9,8 +9,8 @@
     <meta name="description" content="Welcome to 3kh0 lite, a lightweight, fast, and clean game site." />
     <meta name="author" content="3kh0" />
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>T2 Haven</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>3kh0 lite</title>
   </head>
   <body style="background-color: #121212; color: #ffffff; font-family: sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh;">
     <h1 style="font-size: 3em; text-align: center;">3kh0 lite</h1>
@@ -38,16 +38,23 @@
     </p>
 
     <script>
-      // When "Start playing!" is clicked, load projects.html content
+      // Add event listener for "Start playing!"
       document.getElementById('startGameBtn').addEventListener('click', () => {
-        fetch('/projects.html')
-          .then(response => response.text())
+        console.log('Clicked Start Playing!');
+        fetch('/projects.html')  // Make sure this path is correct
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.text();
+          })
           .then(html => {
+            console.log('Fetched HTML:', html);
             // Parse the fetched HTML
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
 
-            // Extract the main content div from projects.html
+            // Extract the element with id="game-container"
             const projectContent = doc.getElementById('game-container');
             const container = document.getElementById('gameContainer');
 
@@ -63,12 +70,14 @@
               // Show the game container
               container.style.display = 'block';
 
-              // Hide the main header, subtitle, and intro paragraph
+              // Hide the initial header elements
               document.querySelector('h1').style.display = 'none';
               document.querySelector('#subtitle').style.display = 'none';
               document.querySelector('p').style.display = 'none';
+
+              console.log('Game content loaded successfully.');
             } else {
-              console.error('Game container not found in fetched HTML.');
+              console.error('No element with id="game-container" found in projects.html');
             }
           })
           .catch(error => {
