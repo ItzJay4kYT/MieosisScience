@@ -26,28 +26,50 @@
       </a>
     </p>
 
-    <!-- Container for game content -->
+    <!-- Container for loaded game content, hidden initially -->
     <div id="gameContainer" style="display:none; width: 100%; max-width: 1200px; margin: 20px auto; padding: 20px; background-color: #222; border-radius: 10px;">
-      <!-- Game content loads here -->
+      <!-- Loaded game content will appear here -->
     </div>
 
+    <!-- Optional footer info -->
     <p style="text-align: center; max-width: 600px; margin: 20px auto;">
-      &copy; 3kh0, 2024. All rights reserved. You are welcome to use and/or duplicate material from the <a href="https://github.com/3kh0/3kh0-lite" style="color: #22c55e;">GitHub repository</a> with proper credit to 3kh0.<br /><br />
-      Contact Echo at <a href="mailto:echo-the-coder@tuta.io" style="color: #22c55e;">echo-the-coder@tuta.io</a>.
+        &copy; 3kh0, 2024. All rights reserved. You are welcome to use and/or duplicate material from the <a href="https://github.com/3kh0/3kh0-lite" style="color: #22c55e;">GitHub repository</a> with proper credit to 3kh0.<br /><br />
+        Contact Echo at <a href="mailto:echo-the-coder@tuta.io" style="color: #22c55e;">echo-the-coder@tuta.io</a>.
     </p>
 
     <script>
-      // Add event listener to the button
+      // When "Start playing!" is clicked, load projects.html content
       document.getElementById('startGameBtn').addEventListener('click', () => {
         fetch('/projects.html')
           .then(response => response.text())
           .then(html => {
-            document.getElementById('gameContainer').innerHTML = html;
-            document.getElementById('gameContainer').style.display = 'block';
-            // Optionally hide the main intro elements
-            document.querySelector('h1').style.display = 'none';
-            document.querySelector('#subtitle').style.display = 'none';
-            document.querySelector('p').style.display = 'none';
+            // Parse the fetched HTML
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            // Extract the main content div from projects.html
+            const projectContent = doc.getElementById('game-container');
+            const container = document.getElementById('gameContainer');
+
+            if (projectContent) {
+              // Clear previous content
+              container.innerHTML = '';
+
+              // Clone and append all children from the fetched content
+              Array.from(projectContent.children).forEach(child => {
+                container.appendChild(child.cloneNode(true));
+              });
+
+              // Show the game container
+              container.style.display = 'block';
+
+              // Hide the main header, subtitle, and intro paragraph
+              document.querySelector('h1').style.display = 'none';
+              document.querySelector('#subtitle').style.display = 'none';
+              document.querySelector('p').style.display = 'none';
+            } else {
+              console.error('Game container not found in fetched HTML.');
+            }
           })
           .catch(error => {
             console.error('Error loading projects:', error);
